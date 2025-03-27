@@ -108,79 +108,87 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _titleController,
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: "Title",
-                hintStyle: TextStyle(color: Colors.white70),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.purple),
-                ),
-              ),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _contentController,
-              style: TextStyle(color: Colors.white),
-              maxLines: 5,
-              decoration: InputDecoration(
-                hintText: "Content",
-                hintStyle: TextStyle(color: Colors.white70),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.purple),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              TextField(
+                controller: _titleController,
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: "Title",
+                  hintStyle: TextStyle(color: Colors.white70),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.purple),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children:
-                  noteColors.map((color) {
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedColor = color;
-                        });
-                      },
-                      child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 5),
-                        width: 35,
-                        height: 35,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color:
+              SizedBox(height: 10),
+              TextField(
+                controller: _contentController,
+                style: TextStyle(color: Colors.white),
+                maxLines: 12,
+                decoration: InputDecoration(
+                  hintText: "Content",
+                  hintStyle: TextStyle(color: Colors.white70),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.purple),
+                  ),
+                ),
+              ),
+              SizedBox(height: 15),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:
+                      noteColors.map((color) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedColor = color;
+                            });
+                          },
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 5),
+                            width: 35,
+                            height: 35,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color:
+                                    selectedColor == color
+                                        ? Colors.white
+                                        : Colors.transparent,
+                                width: 2,
+                              ),
+                            ),
+                            child:
                                 selectedColor == color
-                                    ? Colors.white
-                                    : Colors.transparent,
-                            width: 2,
+                                    ? Icon(
+                                      Icons.check,
+                                      color: Colors.black,
+                                      size: 20,
+                                    )
+                                    : null,
                           ),
-                        ),
-                        child:
-                            selectedColor == color
-                                ? Icon(
-                                  Icons.check,
-                                  color: Colors.black,
-                                  size: 20,
-                                )
-                                : null,
-                      ),
-                    );
-                  }).toList(),
-            ),
-          ],
+                        );
+                      }).toList(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

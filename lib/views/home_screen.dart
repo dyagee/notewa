@@ -315,6 +315,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ? Colors.red
                                     : noteColor == "orange"
                                     ? Colors.orange
+                                    : noteColor == "blue"
+                                    ? Colors.blue
                                     : Colors.white,
                             onDelete: () => _showDeletePopUp(note.id!),
                           ),
