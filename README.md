@@ -4,6 +4,9 @@
 
 Notewa is a simple and colorful note-taking app designed for easy organization and seamless user experience. Capture ideas, manage notes, and personalize them with vibrant colors!  
 
+
+![Mockup image](https://raw.githubusercontent.com/dyagee/notewa/main/lib/assets/images/mockuper.png)
+
 ## ✨ Features  
 
 - 📝 **Create, edit, and delete notes**  
@@ -14,9 +17,6 @@ Notewa is a simple and colorful note-taking app designed for easy organization a
 - 🌙 **Dark mode support (if implemented)**  
 - 🛠️ **Smooth and responsive UI**  
 
-## 📱 Screenshots  
-
-_(to be added)_
 
 ## 🚀 Installation  
 
@@ -71,6 +71,20 @@ _(to be added)_
 - Tap delete icon to remove a note
 
 - Use the search bar to find notes quickly
+
+## 📸 Screenshots  
+
+<details>
+  <summary> Click to View Screenshots</summary>
+
+  ![screenshot1](https://raw.githubusercontent.com/dyagee/notewa/main/lib/assets/images/screenshots/galaxy-s10-mockup%20(1).png)  
+  ![screenshot2](https://raw.githubusercontent.com/dyagee/notewa/main/lib/assets/images/screenshots/galaxy-s10-mockup%20(2).png)  
+  ![screenshot3](https://raw.githubusercontent.com/dyagee/notewa/main/lib/assets/images/screenshots/galaxy-s10-mockup%20(3).png)  
+  ![screenshot4](https://raw.githubusercontent.com/dyagee/notewa/main/lib/assets/images/screenshots/galaxy-s10-mockup%20(4).png)  
+  ![screenshot5](https://raw.githubusercontent.com/dyagee/notewa/main/lib/assets/images/screenshots/galaxy-s10-mockup%20(5).png)  
+  ![screenshot6](https://raw.githubusercontent.com/dyagee/notewa/main/lib/assets/images/screenshots/galaxy-s10-mockup%20(6).png)  
+
+</details>
 
 
 ## 📜 License
