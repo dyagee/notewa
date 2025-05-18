@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notewa/core/color_utils.dart';
+import 'package:notewa/views/add_note_screen.dart';
 import 'package:notewa/views/splash_screen.dart';
 
 // import '../views/add_note_screen.dart';
@@ -8,7 +9,7 @@ import '../views/home_screen.dart';
 
 class AppRoutes {
   static const String home = '/';
-  // static const String addNote = '/add-note';
+  static const String addNote = '/add-note';
   static const String editNote = '/edit-note';
   static const String splashScreen = '/splash-screen';
 
@@ -18,8 +19,15 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => SplashScreen());
       case home:
         return MaterialPageRoute(builder: (_) => HomeScreen());
-      // case addNote:
-      //   return MaterialPageRoute(builder: (_) => AddNoteScreen());
+      case addNote:
+        if (settings.arguments is Map<String, dynamic>) {
+          final args = settings.arguments as Map<String, dynamic>;
+          final callbackFunc = args['callbackFunc'];
+          return MaterialPageRoute(
+            builder: (_) => AddNoteScreen(onNoteAdded: callbackFunc),
+          );
+        }
+        return _errorRoute();
       case editNote:
         if (settings.arguments is Map<String, dynamic>) {
           final args = settings.arguments as Map<String, dynamic>;

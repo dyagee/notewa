@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:notewa/core/routes.dart';
 import 'package:notewa/models/note_model.dart';
 import 'package:notewa/services/note_database_services.dart';
-import 'package:notewa/views/add_note_screen.dart';
 import 'package:notewa/widgets/custom_note_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -146,22 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
           }).toList();
     });
-  }
-
-  /// Function to show modal for add note screen
-  void _showAddNoteBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isDismissible: true,
-      isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: Colors.transparent,
-      builder:
-          (context) => FractionallySizedBox(
-            heightFactor: 0.65,
-            child: AddNoteScreen(onNoteAdded: _loadNotes),
-          ),
-    );
   }
 
   @override
@@ -331,7 +314,13 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton:
           !isSearching
               ? FloatingActionButton(
-                onPressed: _showAddNoteBottomSheet,
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.addNote,
+                    arguments: {"callbackFunc": _loadNotes},
+                  );
+                },
                 backgroundColor: Colors.blue.shade200,
                 child: Icon(Icons.add, color: Colors.white),
               )
