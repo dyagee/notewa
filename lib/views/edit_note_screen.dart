@@ -26,6 +26,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   late TextEditingController _titleController;
   late TextEditingController _contentController;
   late Color selectedColor;
+  bool _isNoteSaved = false;
 
   List<Color> noteColors = notesColors;
 
@@ -38,7 +39,9 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   }
 
   // update note
-  void _updateNote() async {
+  void _updateNote({bool autoSave = false}) async {
+    if (_titleController.text.isEmpty) return;
+
     final db = NoteDatabase.instance;
     int result = await db.updateNote(
       id: widget.id,
@@ -49,7 +52,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
 
     if (result > 0) {
       // Successfully updated
-      if (mounted) {
+      if (mounted && !autoSave) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Saved successfully!'),
@@ -58,9 +61,12 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
           ),
         );
       }
+      setState(() {
+        _isNoteSaved = true;
+      });
     } else {
       // Failed to insert
-      if (mounted) {
+      if (mounted && !autoSave) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to update!'),
@@ -74,120 +80,148 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          if (!_isNoteSaved) {
+            _updateNote(autoSave: true);
+            widget.onNoteEdited!();
+          }
+          Navigator.of(context).maybePop();
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.black,
-        title: Text("Edit Note", style: TextStyle(color: Colors.white)),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Stack(
-              alignment: Alignment.center,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: Text("Edit Note", style: TextStyle(color: Colors.white)),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    margin: EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade900,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      _isNoteSaved
+                          ? Icons.check_circle_outline_rounded
+                          : Icons.check,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    onPressed: () {
+                      // update note
+                      _updateNote();
+                      widget
+                          .onNoteEdited!(); // reload notes in the home screen. To do: handle this in WillPopScope logic
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
               children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  margin: EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade900,
-                    borderRadius: BorderRadius.circular(8.0),
+                TextField(
+                  controller: _titleController,
+                  onChanged: (value) {
+                    setState(() {
+                      _isNoteSaved = false;
+                    });
+                  },
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: "Title",
+                    hintStyle: TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.purple),
+                    ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.check, color: Colors.white, size: 24),
-                  onPressed: () {
-                    // update note
-                    _updateNote();
-                    widget
-                        .onNoteEdited!(); // reload notes in the home screen. To do: handle this in WillPopScope logic
+                SizedBox(height: 10),
+                TextField(
+                  controller: _contentController,
+                  onChanged: (value) {
+                    setState(() {
+                      _isNoteSaved = false;
+                    });
                   },
+                  style: TextStyle(color: Colors.white),
+                  maxLines: 14,
+                  decoration: InputDecoration(
+                    hintText: "Content",
+                    hintStyle: TextStyle(color: Colors.white70),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.purple),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:
+                        noteColors.map((color) {
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedColor = color;
+                              });
+                            },
+                            child: Container(
+                              margin: EdgeInsets.symmetric(horizontal: 5),
+                              width: 35,
+                              height: 35,
+                              decoration: BoxDecoration(
+                                color: color,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color:
+                                      selectedColor == color
+                                          ? Colors.white
+                                          : Colors.transparent,
+                                  width: 2,
+                                ),
+                              ),
+                              child:
+                                  selectedColor == color
+                                      ? Icon(
+                                        Icons.check,
+                                        color: Colors.black,
+                                        size: 20,
+                                      )
+                                      : null,
+                            ),
+                          );
+                        }).toList(),
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        physics: AlwaysScrollableScrollPhysics(),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              TextField(
-                controller: _titleController,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: "Title",
-                  hintStyle: TextStyle(color: Colors.white70),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.purple),
-                  ),
-                ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _contentController,
-                style: TextStyle(color: Colors.white),
-                maxLines: 12,
-                decoration: InputDecoration(
-                  hintText: "Content",
-                  hintStyle: TextStyle(color: Colors.white70),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.purple),
-                  ),
-                ),
-              ),
-              SizedBox(height: 15),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: AlwaysScrollableScrollPhysics(),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:
-                      noteColors.map((color) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedColor = color;
-                            });
-                          },
-                          child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 5),
-                            width: 35,
-                            height: 35,
-                            decoration: BoxDecoration(
-                              color: color,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color:
-                                    selectedColor == color
-                                        ? Colors.white
-                                        : Colors.transparent,
-                                width: 2,
-                              ),
-                            ),
-                            child:
-                                selectedColor == color
-                                    ? Icon(
-                                      Icons.check,
-                                      color: Colors.black,
-                                      size: 20,
-                                    )
-                                    : null,
-                          ),
-                        );
-                      }).toList(),
-                ),
-              ),
-            ],
           ),
         ),
       ),

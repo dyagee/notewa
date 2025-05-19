@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:notewa/core/color_utils.dart';
 import '../models/note_model.dart';
@@ -16,7 +18,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
   final TextEditingController _contentController = TextEditingController();
 
   bool _isSaving = false;
-  // bool _noteSaved = false;
+  bool _isNoteSaved = false;
 
   List<Color> noteColors = notesColors;
   Color selectedColor = Colors.yellow; // Default selected color
@@ -53,9 +55,9 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
 
       if (result > 0) {
         // Successfully inserted
-        // setState(() {
-        //   _noteSaved = true;
-        // });
+        setState(() {
+          _isNoteSaved = true;
+        });
 
         if (mounted && !autoSave) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -99,9 +101,10 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
       canPop: true,
       onPopInvokedWithResult: (didpop, result) async {
         if (didpop) {
-          _addNote(autoSave: true);
-          widget.onNoteAdded(); // load notes in homescreen
-
+          if (!_isNoteSaved) {
+            _addNote(autoSave: true);
+            widget.onNoteAdded(); // load notes in homescreen
+          }
           Navigator.of(context).maybePop();
         }
       },
