@@ -20,11 +20,7 @@ class NoteDatabase {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, fileName);
 
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _createDB,
-    );
+    return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -34,6 +30,7 @@ class NoteDatabase {
         title TEXT NOT NULL,
         content TEXT,
         color TEXT,
+        category TEXT DEFAULT 'General',
         date_created TEXT NOT NULL,
         date_updated TEXT NOT NULL,
         date_deleted TEXT,
@@ -42,17 +39,24 @@ class NoteDatabase {
     ''');
   }
 
-
   // Insert a new note
   Future<int> insertNote(Note note) async {
     final db = await instance.database;
-    return await db.insert('notes', note.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    return await db.insert(
+      'notes',
+      note.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   // Fetch all notes (excluding deleted ones)
   Future<List<Note>> getNotes() async {
     final db = await instance.database;
-    final result = await db.query('notes', where: 'is_deleted = ?', whereArgs: [0]);
+    final result = await db.query(
+      'notes',
+      where: 'is_deleted = ?',
+      whereArgs: [0],
+    );
 
     return result.map((map) => Note.fromMap(map)).toList();
   }
@@ -69,7 +73,12 @@ class NoteDatabase {
   }
 
   // Update a note
-  Future<int> updateNote({required int id, required String title, required String content, required String color}) async {
+  Future<int> updateNote({
+    required int id,
+    required String title,
+    required String content,
+    required String color,
+  }) async {
     final db = await instance.database;
     return await db.update(
       'notes',
@@ -89,10 +98,7 @@ class NoteDatabase {
     final db = await instance.database;
     return await db.update(
       'notes',
-      {
-        'is_deleted': 1,
-        'date_deleted': DateTime.now().toIso8601String(),
-      },
+      {'is_deleted': 1, 'date_deleted': DateTime.now().toIso8601String()},
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -103,10 +109,7 @@ class NoteDatabase {
     final db = await instance.database;
     return await db.update(
       'notes',
-      {
-        'is_deleted': 0,
-        'date_deleted': null,
-      },
+      {'is_deleted': 0, 'date_deleted': null},
       where: 'id = ?',
       whereArgs: [id],
     );

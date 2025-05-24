@@ -1,9 +1,9 @@
-
 class Note {
   int? id;
   String title;
   String? content;
   String? color;
+  String? category;
   DateTime dateCreated;
   DateTime dateUpdated;
   DateTime? dateDeleted;
@@ -14,6 +14,7 @@ class Note {
     required this.title,
     this.content,
     this.color,
+    this.category = 'General', // default
     required this.dateCreated,
     required this.dateUpdated,
     this.dateDeleted,
@@ -27,9 +28,13 @@ class Note {
       title: map['title'],
       content: map['content'],
       color: map['color'],
+      category: map['category'] ?? 'General', // fallback mechanism
       dateCreated: DateTime.parse(map['date_created']),
       dateUpdated: DateTime.parse(map['date_updated']),
-      dateDeleted: map['date_deleted'] != null ? DateTime.parse(map['date_deleted']) : null, // placeholder to avoid null error
+      dateDeleted:
+          map['date_deleted'] != null
+              ? DateTime.parse(map['date_deleted'])
+              : null, // placeholder to avoid null error
       isDeleted: map['is_deleted'] == 1,
     );
   }
@@ -41,11 +46,11 @@ class Note {
       'title': title,
       'content': content,
       'color': color,
+      'category': category,
       'date_created': dateCreated.toIso8601String(),
       'date_updated': dateUpdated.toIso8601String(),
       'date_deleted': dateDeleted?.toIso8601String(),
       'is_deleted': isDeleted ? 1 : 0,
     };
   }
-
 }

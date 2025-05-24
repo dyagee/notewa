@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:notewa/core/category_constants.dart';
 import 'package:notewa/core/color_utils.dart';
 import '../models/note_model.dart';
 import '../services/note_database_services.dart';
@@ -19,9 +20,11 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
 
   bool _isSaving = false;
   bool _isNoteSaved = false;
+  final allCategories = CategoryConstants.predefinedCategories;
 
   List<Color> noteColors = notesColors;
   Color selectedColor = Colors.yellow; // Default selected color
+  String selectedCategory = 'General'; // Default selected
 
   void _addNote({bool autoSave = false}) async {
     if (_titleController.text.isEmpty) {
@@ -43,6 +46,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
         title: _titleController.text,
         content: _contentController.text,
         color: colorToString(selectedColor), // e.g Colors.green to "green"
+        category: selectedCategory,
         dateCreated: DateTime.now(),
         dateUpdated: DateTime.now(),
         dateDeleted: null,
@@ -152,6 +156,36 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: false,
+                      menuMaxHeight: 200,
+                      menuWidth: 200,
+                      value: selectedCategory,
+                      items:
+                          allCategories.map((String category) {
+                            return DropdownMenuItem<String>(
+                              value: category,
+                              child: Text(category),
+                            );
+                          }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            selectedCategory = value;
+                          });
+                        }
+                      },
+                      // decoration: InputDecoration(
+                      // labelText: "Select Category",
+                      //   border: OutlineInputBorder(),
+                      // ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
                 TextField(
                   controller: _titleController,
                   style: TextStyle(color: Colors.white),
@@ -170,7 +204,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                 TextField(
                   controller: _contentController,
                   style: TextStyle(color: Colors.white),
-                  maxLines: 16,
+                  maxLines: 14,
                   decoration: InputDecoration(
                     hintText: "Content",
                     hintStyle: TextStyle(color: Colors.white70),
