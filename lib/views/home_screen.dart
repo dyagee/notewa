@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notewa/core/category_constants.dart';
@@ -52,6 +50,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String? selectedCategory;
   final allCategories = CategoryConstants.predefinedCategories;
   List<String> filteredCategories = [];
+  List<Note> matchedNotesCategories = [];
+  bool isFilterOn = false;
 
   @override
   void initState() {
@@ -142,20 +142,34 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isSearching = query.isNotEmpty;
 
-      filteredNotes =
-          notes.where((note) {
-            return note.title.toLowerCase().contains(query.toLowerCase()) ||
-                note.content!.toLowerCase().contains(query.toLowerCase()) ||
-                note.dateCreated.toIso8601String().toLowerCase().contains(
-                  query.toLowerCase(),
-                );
-          }).toList();
+      if (!isFilterOn) {
+        filteredNotes =
+            notes.where((note) {
+              return note.title.toLowerCase().contains(query.toLowerCase()) ||
+                  note.content!.toLowerCase().contains(query.toLowerCase()) ||
+                  note.dateCreated.toIso8601String().toLowerCase().contains(
+                    query.toLowerCase(),
+                  );
+            }).toList();
+      } else {
+        filteredNotes =
+            matchedNotesCategories.where((note) {
+              return note.title.toLowerCase().contains(query.toLowerCase()) ||
+                  note.content!.toLowerCase().contains(query.toLowerCase()) ||
+                  note.dateCreated.toIso8601String().toLowerCase().contains(
+                    query.toLowerCase(),
+                  );
+            }).toList();
+      }
     });
   }
 
   /// Function to handle notes filtering
   void _filterNotes(List selectedCategories) {
     if (selectedCategories.isEmpty) {
+      setState(() {
+        isFilterOn = false;
+      });
       _loadNotes();
     }
     final matches =
@@ -163,10 +177,10 @@ class _HomeScreenState extends State<HomeScreen> {
           final category = note.category;
           return selectedCategories.contains(category);
         }).toList();
-    print("inside filter: $selectedCategories");
     setState(() {
-      // notes = matches;
+      isFilterOn = true;
       filteredNotes = matches;
+      matchedNotesCategories = matches;
     });
   }
 
@@ -175,7 +189,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final dateFormatter = DateFormat(
       'MMMM dd, yyyy',
     ); // format date to July 28, 2025
-    print("inside buildcontex: $filteredCategories");
     return Scaffold(
       backgroundColor: Colors.black,
       appBar:
@@ -220,7 +233,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                 return StatefulBuilder(
                                   builder: (context, setState) {
                                     return AlertDialog(
-                                      title: const Text("Filter Categories"),
+                                      backgroundColor: Colors.grey[900],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      alignment: Alignment.topRight,
+                                      title: Text(
+                                        "Filter Categories",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
+                                        textAlign: TextAlign.start,
+                                      ),
                                       content: SizedBox(
                                         height: 200,
                                         width: 110,
@@ -230,6 +256,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             final category =
                                                 allCategories[index];
                                             return CheckboxListTile(
+                                              controlAffinity:
+                                                  ListTileControlAffinity
+                                                      .leading,
                                               title: Text(category),
                                               value: filteredCategories
                                                   .contains(category),
@@ -256,7 +285,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                             filteredCategories.clear();
                                             Navigator.of(context).pop();
                                           },
-                                          child: Text("Cancel"),
+                                          child: Text(
+                                            "Cancel",
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
                                         ),
                                         TextButton(
                                           onPressed: () {
@@ -265,9 +299,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                               context,
                                             ).pop(filteredCategories);
                                           },
-                                          child: const Text("Apply Filter"),
+
+                                          child: Text(
+                                            "Apply Filter",
+                                            style: TextStyle(
+                                              color: Colors.blueGrey[400],
+                                            ),
+                                          ),
                                         ),
                                       ],
+                                      actionsAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                     );
                                   },
                                 );
@@ -334,7 +376,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                     isTapped = false;
                                     isSearching = false;
                                     searchController.clear();
-                                    filteredNotes = List.from(notes);
+                                    if (isFilterOn) {
+                                      filteredNotes = matchedNotesCategories;
+                                    } else {
+                                      filteredNotes = List.from(notes);
+                                    }
                                   });
                                   FocusScope.of(context).unfocus();
                                 },
