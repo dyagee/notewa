@@ -161,8 +161,9 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: false,
+                      isDense: true,
                       menuMaxHeight: 200,
-                      menuWidth: 200,
+                      menuWidth: 110,
                       value: selectedCategory,
                       items:
                           allCategories.map((String category) {

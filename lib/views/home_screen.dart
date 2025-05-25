@@ -1,5 +1,8 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:notewa/core/category_constants.dart';
 import 'package:notewa/core/routes.dart';
 import 'package:notewa/models/note_model.dart';
 import 'package:notewa/services/note_database_services.dart';
@@ -46,6 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Note> notes = [];
   List<Note> filteredNotes = [];
   final db = NoteDatabase.instance;
+  String? selectedCategory;
+  final allCategories = CategoryConstants.predefinedCategories;
+  List<String> filteredCategories = [];
 
   @override
   void initState() {
@@ -147,11 +153,29 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  /// Function to handle notes filtering
+  void _filterNotes(List selectedCategories) {
+    if (selectedCategories.isEmpty) {
+      _loadNotes();
+    }
+    final matches =
+        notes.where((note) {
+          final category = note.category;
+          return selectedCategories.contains(category);
+        }).toList();
+    print("inside filter: $selectedCategories");
+    setState(() {
+      // notes = matches;
+      filteredNotes = matches;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateFormatter = DateFormat(
       'MMMM dd, yyyy',
     ); // format date to July 28, 2025
+    print("inside buildcontex: $filteredCategories");
     return Scaffold(
       backgroundColor: Colors.black,
       appBar:
@@ -169,6 +193,91 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(fontSize: 28, color: Colors.white),
                 ),
                 actions: [
+                  Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          margin: EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade900,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.filter_alt_outlined,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                          onPressed: () async {
+                            await showDialog(
+                              context: context,
+                              builder: (context) {
+                                return StatefulBuilder(
+                                  builder: (context, setState) {
+                                    return AlertDialog(
+                                      title: const Text("Filter Categories"),
+                                      content: SizedBox(
+                                        height: 200,
+                                        width: 110,
+                                        child: ListView.builder(
+                                          itemCount: allCategories.length,
+                                          itemBuilder: (context, index) {
+                                            final category =
+                                                allCategories[index];
+                                            return CheckboxListTile(
+                                              title: Text(category),
+                                              value: filteredCategories
+                                                  .contains(category),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  if (value == true) {
+                                                    filteredCategories.add(
+                                                      category,
+                                                    );
+                                                  } else {
+                                                    filteredCategories.remove(
+                                                      category,
+                                                    );
+                                                  }
+                                                });
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            filteredCategories.clear();
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text("Cancel"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            _filterNotes(filteredCategories);
+                                            Navigator.of(
+                                              context,
+                                            ).pop(filteredCategories);
+                                          },
+                                          child: const Text("Apply Filter"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(2.0),
                     child: Stack(
