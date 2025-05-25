@@ -221,8 +221,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(
-                            Icons.filter_alt_outlined,
+                          icon: Icon(
+                            filteredCategories.isEmpty
+                                ? Icons.filter_alt_outlined
+                                : Icons.filter_alt_rounded,
                             color: Colors.white,
                             size: 24,
                           ),
@@ -317,6 +319,32 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                         ),
+                        if (filteredCategories.isNotEmpty)
+                          Positioned(
+                            right: 4,
+                            top: 4,
+                            child: Container(
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.redAccent,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: BoxConstraints(
+                                minHeight: 14,
+                                minWidth: 14,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "${filteredCategories.length}",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
