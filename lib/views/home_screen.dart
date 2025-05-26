@@ -194,8 +194,6 @@ class _HomeScreenState extends State<HomeScreen> {
       'MMMM dd, yyyy',
     ); // format date to July 28, 2025
 
-    // ignore: avoid_print
-    print(filteredCategories);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar:

@@ -78,6 +78,7 @@ class NoteDatabase {
     required String title,
     required String content,
     required String color,
+    required String category,
   }) async {
     final db = await instance.database;
     return await db.update(
@@ -86,6 +87,7 @@ class NoteDatabase {
         'title': title,
         'content': content,
         'color': color,
+        'category': category,
         'date_updated': DateTime.now().toIso8601String(),
       },
       where: 'id = ?',

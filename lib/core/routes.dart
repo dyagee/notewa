@@ -39,6 +39,7 @@ class AppRoutes {
                   id: note['id'],
                   title: note['title'] as String,
                   content: note['content'],
+                  category: note['category'],
                   initialColor: stringToColor(
                     note['color'],
                   ), // e.g "green" to Colors.green

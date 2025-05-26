@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notewa/core/category_constants.dart';
 import 'package:notewa/core/color_utils.dart';
 import 'package:notewa/services/note_database_services.dart';
 
@@ -7,6 +8,7 @@ class EditNoteScreen extends StatefulWidget {
   final String title;
   final String content;
   final Color initialColor;
+  final String category;
   final VoidCallback? onNoteEdited;
 
   const EditNoteScreen({
@@ -15,6 +17,7 @@ class EditNoteScreen extends StatefulWidget {
     required this.title,
     required this.content,
     required this.initialColor,
+    required this.category,
     this.onNoteEdited,
   });
 
@@ -27,8 +30,10 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   late TextEditingController _contentController;
   late Color selectedColor;
   bool _isNoteSaved = false;
+  late String selectedCategory;
 
   List<Color> noteColors = notesColors;
+  final allCategories = CategoryConstants.predefinedCategories;
 
   @override
   void initState() {
@@ -36,6 +41,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     _titleController = TextEditingController(text: widget.title);
     _contentController = TextEditingController(text: widget.content);
     selectedColor = widget.initialColor;
+    selectedCategory = widget.category;
   }
 
   // update note
@@ -48,6 +54,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       title: _titleController.text.trim(),
       content: _contentController.text.trim(),
       color: colorToString(selectedColor),
+      category: selectedCategory,
     );
 
     if (result > 0) {
@@ -138,6 +145,33 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
             padding: EdgeInsets.all(16),
             child: Column(
               children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: false,
+                      isDense: true,
+                      menuMaxHeight: 200,
+                      menuWidth: 110,
+                      value: selectedCategory,
+                      items:
+                          allCategories.map((String category) {
+                            return DropdownMenuItem<String>(
+                              value: category,
+                              child: Text(category),
+                            );
+                          }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            selectedCategory = value;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
                 TextField(
                   controller: _titleController,
                   onChanged: (value) {
