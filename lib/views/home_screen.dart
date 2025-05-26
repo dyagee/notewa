@@ -65,7 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
     List<Note> loadedNotes = await db.getNotes();
     setState(() {
       notes = loadedNotes;
-      filteredNotes = notes;
+      if (isFilterOn) {
+        _filterNotes(filteredCategories); // filter based on categories selected
+      } else {
+        filteredNotes = notes;
+      }
     });
   }
 
@@ -189,6 +193,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final dateFormatter = DateFormat(
       'MMMM dd, yyyy',
     ); // format date to July 28, 2025
+
+    // ignore: avoid_print
+    print(filteredCategories);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar:
